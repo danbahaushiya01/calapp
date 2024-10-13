@@ -1,5 +1,6 @@
 import 'package:calapp/pages/buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     '9',
     '8',
     '7',
-    'X',
+    '*',
     '6',
     '5',
     '4',
@@ -48,15 +49,23 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(height: 50,),
+                SizedBox(
+                  height: 50,
+                ),
                 Container(
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerLeft,
-                    child: Text(userQuestion, style: TextStyle(fontSize: 20),)),
+                    child: Text(
+                      userQuestion,
+                      style: TextStyle(fontSize: 20),
+                    )),
                 Container(
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerRight,
-                    child: Text(userAnswer,style: TextStyle(fontSize: 20),))
+                    child: Text(
+                      userAnswer,
+                      style: TextStyle(fontSize: 20),
+                    ))
               ],
             ),
           )),
@@ -71,9 +80,9 @@ class _HomePageState extends State<HomePage> {
                     if (index == 0) {
                       //clear button
                       return MyButton(
-                        buttonTapped: (){
+                        buttonTapped: () {
                           setState(() {
-                             userQuestion ='';
+                            userQuestion = '';
                           });
                         },
                         buttonText: buttons[index],
@@ -83,25 +92,38 @@ class _HomePageState extends State<HomePage> {
                     } else if (index == 1) {
                       //delete button
                       return MyButton(
-                        buttonTapped: (){
+                        buttonTapped: () {
                           setState(() {
-                            userQuestion=userQuestion.substring(0,userQuestion.length-1);
+                            userQuestion = userQuestion.substring(
+                                0, userQuestion.length - 1);
                           });
                         },
                         buttonText: buttons[index],
                         color: Colors.red,
                         textColor: Colors.white,
                       );
+                    }
+
+                    //Equal Button
+                    else if (index == buttons.length - 1) {
+                      return MyButton(
+                        buttonTapped: () {
+                          setState(() {
+                            equalPress();
+                          });
+                        },
+                        buttonText: buttons[index],
+                        color: Colors.deepPurple,
+                        textColor: Colors.white,
+                      );
                     } else {
                       //Rest of the Buttons
                       return MyButton(
-
-                         buttonTapped: (){
-                            setState(() {
-                              userQuestion +=buttons[index];
-                            });
-                         },
-
+                        buttonTapped: () {
+                          setState(() {
+                            userQuestion += buttons[index];
+                          });
+                        },
                         buttonText: buttons[index],
                         color: isOperator(buttons[index])
                             ? Colors.deepPurple
@@ -119,10 +141,19 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  bool isOperator(String x) {
-    if (x == '%' || x == '/' || x == 'X' || x == '-' || x == '+' || x == '=') {
+  bool isOperator(String X) {
+    if (X == '%' || X == '/' || X == '*' || X == '-' || X == '+' || X == '=') {
       return true;
     }
     return false;
+  }
+
+  void equalPress() {
+    String finalQuestion = userQuestion;
+    Parser p = Parser();
+    Expression exp = p.parse(finalQuestion);
+    ContextModel cm = ContextModel();
+    double eval = exp.evaluate(EvaluationType.REAL, cm);
+    userAnswer = eval.toString();
   }
 }
